@@ -1,6 +1,6 @@
 # skystats-v2
 
-View BlueSky account statics. Try it [here](skystats.mariozechner.at).
+View BlueSky account statics. Try it [here](https://skystats.mariozechner.at).
 
 ### Development
 
