@@ -1,15 +1,20 @@
 {
   "app": {
-    "description": "A super duper app",
-    "domain": "app.io",
-    "email": "badlogicgames@gmail.com",
-    "host": "marioslab.io",
+    "description": "Analyze your BlueSky account",
+    "domain": "skystats.mariozechner.at",
+    "email": "contact@mariozechner.at",
+    "host": "slayer.marioslab.io",
     "hostDir": "/home/badlogic",
-    "name": "app",
+    "name": "skystats-v2",
     "serverPort": 3333
   },
   "dependencies": {
+    "@atproto/api": "^0.13.16",
+    "@intrnl/bluesky-client": "^0.2.6",
+    "@types/stopword": "^2.0.3",
     "body-parser": "^1.20.2",
+    "chart.js": "^4.4.6",
+    "chartjs-chart-wordcloud": "^4.4.4",
     "chokidar": "^3.5.3",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
@@ -21,6 +26,7 @@
     "path-to-regexp": "^6.2.1",
     "pg": "^8.11.3",
     "remixicon": "^3.5.0",
+    "stopword": "^3.1.1",
     "tailwindcss-animated": "1.0.1",
     "typescript": "5.3.3",
     "ws": "8.15.1"
@@ -43,7 +49,7 @@
     "tailwindcss": "3.4.0"
   },
   "license": "MIT",
-  "name": "__app_name__",
+  "name": "skystats-v2",
   "scripts": {
     "build": "npm run build:css && npm run build:site && npm run build:server",
     "build:css": "npx tailwindcss -i html/styles.css -o html/build/styles-bundle.css",

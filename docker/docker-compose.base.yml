@@ -20,26 +20,13 @@ services:
             dockerfile: Dockerfile
         stop_grace_period: 0s
         environment:
-            PORT: __app_server_port__
-            DATABASE: __app_db_name__
-            DATABASE_USER: __app_db_user__
-            DATABASE_PASSWORD: __app_db_password__
+            PORT: 3333
+            DATABASE: ${SKYSTATS-V2_DB}
+            DATABASE_USER: ${SKYSTATS-V2_DB_USER}
+            DATABASE_PASSWORD: ${SKYSTATS-V2_DB_PASSWORD}
         volumes:
             - ./data:/data
             - ../:/app
-        links:
-            - db
-        networks:
-            - network
-    db:
-        image: postgres:16-alpine
-        restart: always
-        environment:
-            POSTGRES_DB: __app_db_name__
-            POSTGRES_USER: __app_db_user__
-            POSTGRES_PASSWORD: __app_db_password__
-        volumes:
-            - db_data:/var/lib/postgresql/data
         networks:
             - network
 

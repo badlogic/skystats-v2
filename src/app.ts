@@ -23,7 +23,7 @@ export class App extends LitElement {
         super.firstUpdated(_changedProperties);
         router.addRoute(
             "/",
-            () => html`<main-page></main-page>`,
+            () => html`<sky-stats></sky-stats>`,
             () => "app"
         );
         router.addRoute(
@@ -37,8 +37,8 @@ export class App extends LitElement {
             () => "Settings"
         );
 
-        router.setRootRoute("/");
+        // router.setRootRoute("/");
         router.setNotFoundRoot("/404");
-        router.replace(location.pathname);
+        router.replace(location.pathname + location.search);
     }
 }

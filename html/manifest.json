@@ -1,7 +1,7 @@
 {
-    "name": "__app_name__",
-    "short_name": "__app_name__",
-    "description": "__app_description__",
+    "name": "skystats-v2",
+    "short_name": "skystats-v2",
+    "description": "Analyze your BlueSky account",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#000c15",

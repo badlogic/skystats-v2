@@ -2,7 +2,7 @@
 
 set -e
 
-project=__app_name__
+project=skystats-v2
 
 printHelp () {
 	echo "Usage: control.sh <command>"
