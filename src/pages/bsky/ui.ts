@@ -59,7 +59,7 @@ export class TextOverlay extends LitElement {
         return html`<div class="relative">
             <button @click=${() => (this.show = !this.show)} class="rounded bg-hinted-fg p-1 text-white text-xs">${this.buttonText}</button>
             ${this.show
-                ? html`<button @click=${() => (this.show = !this.show)} class="absolute bg-black text-white p-4 rounded-lg border border-muted">
+                ? html`<button @click=${() => (this.show = !this.show)} class="absolute bg-black text-white p-4 rounded-lg borderd">
                       <div class="w-[250px]">${this.text}</div>
                   </button>`
                 : nothing}
@@ -136,37 +136,37 @@ function renderEmbeddedRecord(record: AppBskyEmbedRecord.View["record"]): Return
         const postText =
             record.value && AppBskyFeedPost.isRecord(record.value) ? unsafeHTML(processText(record.value)) : html`<div>Unsupported record type</div>`;
         const embed = renderEmbed(record.embeds ? record.embeds[0] : undefined);
-        return html`<div class="rounded-lg border border-muted mt-4 p-4">
+        return html`<div class="rounded-lg border mt-4 p-4">
             ${renderPostHeader(record.author, record.uri, record.indexedAt, true)}
             <div class="mb-2">${postText}</div>
             ${embed}
         </div>`;
     } else if (AppBskyEmbedRecord.isViewNotFound(record)) {
-        return html`<div class="rounded-lg border border-muted mt-4 p-4 text-red-500">Post not found</div>`;
+        return html`<div class="rounded-lg border mt-4 p-4 text-red-500">Post not found</div>`;
     } else if (AppBskyEmbedRecord.isViewBlocked(record)) {
-        return html`<div class="rounded-lg border border-muted mt-4 p-4 text-yellow-500">This content is blocked</div>`;
+        return html`<div class="rounded-lg border mt-4 p-4 text-yellow-500">This content is blocked</div>`;
     } else if (AppBskyEmbedRecord.isViewDetached(record)) {
-        return html`<div class="rounded-lg border border-muted mt-4 p-4 text-gray-500">Content no longer available</div>`;
+        return html`<div class="rounded-lg border mt-4 p-4 text-gray-500">Content no longer available</div>`;
     } else if (AppBskyFeedDefs.isGeneratorView(record)) {
-        return html`<div class="rounded-lg border border-muted mt-4 p-4 bg-blue-50 p-4">Feed Generator: ${record.displayName}</div>`;
+        return html`<div class="rounded-lg border mt-4 p-4 bg-blue-50 p-4">Feed Generator: ${record.displayName}</div>`;
     } else if (AppBskyGraphDefs.isListView(record)) {
-        return html`<div class="flex flex-col items-centered rounded-lg border border-muted mt-4 p-4 p-4">
+        return html`<div class="flex flex-col items-centered rounded-lg border mt-4 p-4 p-4">
                 <h2>${record.name ?? "(No name given)"}</h2>
                 <div>${record.description ?? "(No description given)"}</div>
                 <div class="mt-4 flex gap-2 text-muted-fg text-sm"><span>A list by</span> ${renderProfile(record.creator, true)}</div>
             </div>
         </div>`
     } else if (AppBskyLabelerDefs.isLabelerView(record)) {
-        return html`<div class="rounded-lg border border-muted mt-4 p-4 bg-green-50 p-4">Labeler: ${record.displayName}</div>`;
+        return html`<div class="rounded-lg border mt-4 p-4 bg-green-50 p-4">Labeler: ${record.displayName}</div>`;
     } else if (AppBskyGraphDefs.isStarterPackViewBasic(record)) {
-        return html`<div class="flex flex-col items-centered rounded-lg border border-muted mt-4 p-4 p-4">
+        return html`<div class="flex flex-col items-centered rounded-lg border mt-4 p-4 p-4">
                 <h2>${(record.record as any).name ?? "(No name given)"}</h2>
                 <div>${(record.record as any).description ?? "(No description given)"}</div>
                 <div class="mt-4 flex gap-2 text-muted-fg text-sm"><span>A started pack by</span> ${renderProfile(record.creator, true)}</div>
             </div>
         </div>`;
     } else {
-        return html`<div class="rounded-lg border border-muted mt-4 p-4 text-red-500">Unknown embedded record type: ${record.$type}</div>`;
+        return html`<div class="rounded-lg border mt-4 p-4 text-red-500">Unknown embedded record type: ${record.$type}</div>`;
     }
 }
 
@@ -212,7 +212,7 @@ function renderEmbed(embed: PostView["embed"] | undefined): ReturnType<typeof ht
             `;
         } else if (AppBskyEmbedExternal.isView(embed)) {
             return html`
-                <a href="${embed.external.uri}" class="border border-muted rounded-lg" target="_blank" style="display: block">
+                <a href="${embed.external.uri}" class="border rounded-lg" target="_blank" style="display: block">
                     ${embed.external.thumb ? html`<img class="rounded-t-lg" src="${embed.external.thumb}" alt="${embed.external.title}" />` : html``}
                     <div class="p-4 ${embed.external.thumb ? "border-t border-muted" : ""}">
                         <div class="text-primary-fg truncate">${embed.external.title}</div>
@@ -261,7 +261,7 @@ export function renderPost(post: FeedViewPost): ReturnType<typeof html> {
         }
     };
 
-    return html`<div class="rounded-lg border border-muted mt-4 p-4 cursor-pointer w-full" @click=${(ev: Event) => postClicked(ev)}>
+    return html`<div class="rounded-lg border mt-4 p-4 cursor-pointer w-full" @click=${(ev: Event) => postClicked(ev)}>
         ${renderPostHeader(post.post.author, post.post.uri, record.createdAt, false)}
         ${inReplyTo}
         <div class="mb-2">${postText}</div>

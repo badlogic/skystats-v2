@@ -46,9 +46,6 @@ module.exports = {
                 8: "8",
                 16: "16",
             },
-            borderColor: {
-                'muted': 'var(--muted-fg)'
-            },
         },
     },
     plugins: [require("tailwindcss-animated")],

@@ -2,7 +2,7 @@ import { LitElement, PropertyValueMap, TemplateResult, html } from "lit";
 import { map } from "lit-html/directives/map.js";
 import { customElement, state } from "lit/decorators.js";
 import { getProfileData, ProfileData } from "./bsky/data";
-import { spinnerIcon } from "../utils/icons";
+import { moonIcon, spinnerIcon, sunIcon } from "../utils/icons";
 import { defaultAvatar, renderPost } from "./bsky/ui";
 import { unsafeHTML } from "lit-html/directives/unsafe-html.js";
 // @ts-ignore
@@ -13,10 +13,45 @@ import { dom } from "../utils/ui-components";
 import { Chart, registerables } from "chart.js";
 import { WordCloudController, WordElement } from "chartjs-chart-wordcloud";
 import { generateDates, generateHours, generateWeekdays } from "../utils/utils";
-import { FeedViewPost } from "@atproto/api/dist/client/types/app/bsky/feed/defs";
+import { Store } from "../utils/store";
 
 Chart.register(...registerables);
 Chart.register(WordCloudController, WordElement);
+
+type Theme = "dark" | "light";
+
+@customElement("theme-toggle")
+export class ThemeToggle extends LitElement {
+    @state()
+    theme: Theme = "dark";
+
+    protected createRenderRoot(): Element | ShadowRoot {
+        return this;
+    }
+
+    connectedCallback(): void {
+        super.connectedCallback();
+        this.theme = Store.getTheme() ?? "dark";
+        this.setTheme(this.theme);
+    }
+
+    setTheme(theme: Theme) {
+        Store.setTheme(theme);
+        if (theme == "dark") document.documentElement.classList.add("dark");
+        else document.documentElement.classList.remove("dark");
+    }
+
+    toggleTheme() {
+        this.theme = this.theme == "dark" ? "light" : "dark";
+        this.setTheme(this.theme);
+    }
+
+    render() {
+        return html`<button class="flex items-center justify-center w-10 h-10" @click=${this.toggleTheme}>
+            <i class="icon w-5 h-5">${this.theme == "dark" ? moonIcon : sunIcon}</i>
+        </button>`;
+    }
+}
 
 @customElement("sky-stats")
 class SkyStats extends LitElement {
@@ -138,6 +173,7 @@ class SkyStats extends LitElement {
         }
 
         return html` <main class="flex flex-col justify-between m-auto max-w-[728px] px-4 h-full leading-5">
+            <div class="flex"><div class="flex-grow"></div><theme-toggle class="w-10 h-10"></theme-toggle></div>
             <a class="text-2xl flex align-center justify-center text-primary font-bold text-center my-8" href="/"
                 ><i class="w-[32px] h-[32px] inline-block fill-primary">${unsafeHTML(logoSvg)}</i><span class="ml-2">Skystats</span></a
             >
