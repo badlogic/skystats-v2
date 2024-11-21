@@ -150,11 +150,21 @@ function renderEmbeddedRecord(record: AppBskyEmbedRecord.View["record"]): Return
     } else if (AppBskyFeedDefs.isGeneratorView(record)) {
         return html`<div class="rounded-lg border border-muted mt-4 p-4 bg-blue-50 p-4">Feed Generator: ${record.displayName}</div>`;
     } else if (AppBskyGraphDefs.isListView(record)) {
-        return html`<div class="rounded-lg border border-muted mt-4 p-4 bg-purple-50 p-4">List: ${record.name}</div>`;
+        return html`<div class="flex flex-col items-centered rounded-lg border border-muted mt-4 p-4 p-4">
+                <h2>${record.name ?? "(No name given)"}</h2>
+                <div>${record.description ?? "(No description given)"}</div>
+                <div class="mt-4 flex gap-2 text-muted-fg text-sm"><span>A list by</span> ${renderProfile(record.creator, true)}</div>
+            </div>
+        </div>`
     } else if (AppBskyLabelerDefs.isLabelerView(record)) {
         return html`<div class="rounded-lg border border-muted mt-4 p-4 bg-green-50 p-4">Labeler: ${record.displayName}</div>`;
     } else if (AppBskyGraphDefs.isStarterPackViewBasic(record)) {
-        return html`<div class="rounded-lg border border-muted mt-4 p-4 bg-yellow-50 p-4">Starter Pack: ${record.name}</div>`;
+        return html`<div class="flex flex-col items-centered rounded-lg border border-muted mt-4 p-4 p-4">
+                <h2>${(record.record as any).name ?? "(No name given)"}</h2>
+                <div>${(record.record as any).description ?? "(No description given)"}</div>
+                <div class="mt-4 flex gap-2 text-muted-fg text-sm"><span>A started pack by</span> ${renderProfile(record.creator, true)}</div>
+            </div>
+        </div>`;
     } else {
         return html`<div class="rounded-lg border border-muted mt-4 p-4 text-red-500">Unknown embedded record type: ${record.$type}</div>`;
     }

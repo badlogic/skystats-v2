@@ -24,7 +24,7 @@ export class App extends LitElement {
         router.addRoute(
             "/",
             () => html`<sky-stats></sky-stats>`,
-            () => "app"
+            () => "Skystats"
         );
         router.addRoute(
             "/404",

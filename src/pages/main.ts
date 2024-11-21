@@ -168,11 +168,11 @@ class SkyStats extends LitElement {
                 <a class="text-center" href="https://bsky.app/profile/${author.handle ?? author.did}" target="_blank">
                     ${author.avatar ? html`<img class="w-[6em] h-[6em] rounded-full" src="${author.avatar}" />` : defaultAvatar}
                 </a>
-                <a class="text-center" href="https://bsky.app/profile/${author.handle ?? author.did}" target="_blank">
+                <a class="text-center mt-4" href="https://bsky.app/profile/${author.handle ?? author.did}" target="_blank">
                     <span class="text-xl">${author.displayName ?? author.handle}</span>
                 </a>
             </div>
-            <div class="mx-auto font-bold text-xl text-center">${this.days} day(s) activity</div>
+            <div class="mx-auto font-bold text-xl text-center mt-4">${this.days} day(s) activity</div>
             <div class="text-center text-lg flex flex-col">
                 <span>Posted <span class="text-primary">${postsCount}</span> skeets</span>
                 <span>Received <span class="text-primary">${repostsCount}</span> reposts</span>
