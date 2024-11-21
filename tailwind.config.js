@@ -34,6 +34,7 @@ module.exports = {
                     900: "#6b301c",
                     950: "#3d170b",
                 },
+                link: "var(--link-color)"
             },
             screens: {
                 pwa: { raw: "(display-mode: standalone)" },
@@ -44,6 +45,9 @@ module.exports = {
             lineClamp: {
                 8: "8",
                 16: "16",
+            },
+            borderColor: {
+                'muted': 'var(--muted-fg)'
             },
         },
     },

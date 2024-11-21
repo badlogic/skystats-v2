@@ -4,7 +4,7 @@
 
 /* Light theme variables */
 :root {
-    --background: #ffffff;
+    --background: rgb(30, 27, 42);
     --accent: #2563eb;
     --accent-dark: #1e40af;
     --primary: #cc7d24;
@@ -18,6 +18,7 @@
     --muted-fg: #6b7280;
     --input: #e5e7eb;
     --divider: #d1d5db;
+    --link-color: #65a0ff;
 }
 
 /* Dark theme variables */
@@ -36,12 +37,14 @@
     --muted-fg: #9ca3af;
     --input: #4b5563;
     --divider: #333;
+    --link-color: #65a0ff;
 }
 
 @layer base {
     html,
     body {
         @apply w-full leading-normal;
+        @apply text-primary-fg;
     }
 
     .hidden {
@@ -61,7 +64,7 @@
     }
 
     a {
-        @apply break-words hover:underline;
+        @apply break-words text-link;
     }
 
     iframe {

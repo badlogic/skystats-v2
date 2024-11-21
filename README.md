@@ -1,6 +1,6 @@
-# app-template
+# skystats-v2
 
-Used to create new (progressive) web apps and deploy them to a server running Docker and nginx-proxy for SSL cert generation.
+View BlueSky account statics. Try it [here](skystats.mariozechner.at).
 
 ### Development
 
@@ -11,9 +11,4 @@ Used to create new (progressive) web apps and deploy them to a server running Do
 npm run dev
 ```
 
-In VS Code run the `server` and `client` launch configurations.
-
-### Deployment
-
-1. Deploy backend & frontend: `./publish.sh server`
-1. Deploy just the frontend: `./publish.sh`
+In VS Code run the `dev` launch configurations to start debugging both the client and server code (the server currently does nothing other than supporting hot-reload).
