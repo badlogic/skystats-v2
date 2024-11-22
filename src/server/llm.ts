@@ -10,8 +10,8 @@ if (!openaiKey) {
 
 const openAI = new OpenAI({ apiKey: openaiKey });
 const modelName = "gpt-4o-mini";
-const maxTokens = 4096;
-const temperature = 0.5;
+const maxTokens = 2048;
+const temperature = 0.8;
 
 const enc = getEncoding("cl100k_base");
 const getNumTokens = (message: string) => enc.encode(message).length;
@@ -43,17 +43,17 @@ export async function summarize(texts: string[]) {
 
     The humorous summary can make fun of the account, but should not be mean, discriminatory, or otherwise offensive or hurtful.
 
-    Only output the summaries as instructed. Do not output headers like "Serious Summary:" or similar.
+    Only output the summaries as instructed. Write in English. Do not output headers like "Serious Summary:" or similar. Do not use
+    a "swiss army knife" or "roller coaster" analogies in the humorous summary.
     `
     const messages: ChatCompletionMessageParam[] = [{
         role: "system",
         content: prompt
     }]
-    console.log(messages[0].content);
     const response = await openAI.chat.completions.create({
         model: modelName,
         messages,
-        temperature: 0.5
+        temperature
     })
     return response.choices[0].message.content;
 }

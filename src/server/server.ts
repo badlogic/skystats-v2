@@ -28,7 +28,12 @@ if (!openaiKey) {
     app.use(json());
     app.use(bodyParser.urlencoded({ extended: true }));
 
-    const summaryCache: Record<string, string> = {};
+    let summaryCache: Record<string, string> = {};
+
+    app.get("/api/clear", (req, res) => {
+        summaryCache = {};
+        res.json("OK");
+    });
 
     app.post("/api/summarize", async (req, res) => {
         try {
