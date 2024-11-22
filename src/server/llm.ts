@@ -32,7 +32,7 @@ export async function summarize(texts: string[]) {
 
     const prompt = `
     You are given posts from a single account on BlueSky, in descending order by engagement. Each post is delimited
-    by three backticks. The posts were on BlueSky, not Twitter. Here are the posts.
+    by three backticks. The posts were made on BlueSky, not Twitter. Here are the posts.
 
     ${concatenatedTexts}
 
