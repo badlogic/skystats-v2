@@ -10,8 +10,8 @@ if (!openaiKey) {
 
 const openAI = new OpenAI({ apiKey: openaiKey });
 const modelName = "gpt-4o-mini";
-const maxTokens = 2048;
-const temperature = 0.8;
+const maxTokens = 4096;
+const temperature = 0.75;
 
 const enc = getEncoding("cl100k_base");
 const getNumTokens = (message: string) => enc.encode(message).length;
@@ -31,20 +31,22 @@ export async function summarize(texts: string[]) {
     }
 
     const prompt = `
-    You are given social media posts from a single account in descending chronological order. Each post is delimited
-    by three backticks. Here are the posts.
+    You are given from a single account on BlueSky, in descending order by engagement. Each post is delimited
+    by three backticks. The posts were on BlueSky, not Twitter. Here are the posts.
 
     ${concatenatedTexts}
 
     Create a serious and a humorous summary of the account's content, each 2-3 paragraphs long. Separate the two summaries
     by a single line with the content ">>>>>>>>>>>>>".
 
-    The serious summary should highlight topics the account discusses.
+    The serious summary should highlight topics the account discusses. Readers of the summary should get a good idea what
+    specific topics they can expect from the account.
 
-    The humorous summary can make fun of the account, but should not be mean, discriminatory, or otherwise offensive or hurtful.
+    The humorous summary can make fun of the account, but should not be mean, discriminatory, or otherwise offensive or hurtful. Do not use
+    phrases like "swiss army knife", "roller coaster", "buffet", "Welcome to the ... world", "soap opera", "grab your popcorn", and so on. Stay away from bland, stereotypical
+    analogies.
 
-    Only output the summaries as instructed. Write in English. Do not output headers like "Serious Summary:" or similar. Do not use
-    a "swiss army knife" or "roller coaster" analogies in the humorous summary.
+    Only output the summaries as instructed. Write in English. Do not output headers like "Serious Summary:" or similar.
     `
     const messages: ChatCompletionMessageParam[] = [{
         role: "system",
