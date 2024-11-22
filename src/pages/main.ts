@@ -76,6 +76,7 @@ class SkyStats extends LitElement {
     constructor() {
         super();
         this.handle = new URL(location.href).searchParams.get("handle") ?? undefined;
+        if (this.handle) this.handle = this.handle.replace(/[\u200B-\u200F\u202A-\u202E\uFEFF]/g, "");
         try {
             this.days = Number.parseInt(new URL(location.href).searchParams.get("days")!);
         } catch (e) {
@@ -129,7 +130,7 @@ class SkyStats extends LitElement {
         const daysElement = this.querySelector<HTMLInputElement>("#days");
         if (!daysElement) return;
         const newUrl = new URL(location.href);
-        newUrl.searchParams.set("handle", accountElement.value ?? "");
+        newUrl.searchParams.set("handle", accountElement.value.trim() ?? "");
         newUrl.searchParams.set("days", daysElement.value ?? "30");
         location.href = newUrl.href;
     }
@@ -141,7 +142,7 @@ class SkyStats extends LitElement {
             content = html`<div>Sorry, something went wrong loading statistics for ${this.handle}</div>`;
         } else if (this.loading) {
             content = html` <div class="mx-auto">Fetching posts, calculating stats</div>
-                <div class="mx-auto">This could take a little while</div>
+                <div class="mx-auto">This could take a little while (up to 30 seconds)</div>
                 <div class="w-full mt-8 flex items-center justify-center">
                     <i class="icon !w-8 !h-8 text-link animate-spin">${spinnerIcon}</i>
                 </div>`;
@@ -173,10 +174,13 @@ class SkyStats extends LitElement {
         }
 
         return html` <main class="flex flex-col justify-between m-auto max-w-[728px] px-4 h-full leading-5">
-            <div class="flex"><div class="flex-grow"></div><theme-toggle class="w-10 h-10"></theme-toggle></div>
-            <a class="text-2xl flex align-center justify-center text-primary font-bold text-center my-8" href="/"
-                ><i class="w-[32px] h-[32px] inline-block fill-primary">${unsafeHTML(logoSvg)}</i><span class="ml-2">Skystats</span></a
-            >
+            <div class="relative">
+                <a class="w-full text-2xl flex items-center justify-center text-primary font-bold text-center my-8" href="/">
+                    <i class="w-[32px] h-[32px] inline-block fill-primary">${unsafeHTML(logoSvg)}</i>
+                    <span class="ml-2">Skystats</span>
+                </a>
+                <theme-toggle class="absolute right-0 top-0 w-10 h-10"></theme-toggle>
+            </div>
             <div class="flex-grow flex flex-col">${content}</div>
             <div class="text-center text-xs italic my-4 pb-4">
                 <a href="https://skystats.mariozechner.at" target="_blank">Skystats</a>
@@ -195,9 +199,16 @@ class SkyStats extends LitElement {
         const postsCount = this.data.posts.length;
         const repostsCount = this.stats.receivedReposts;
         const likeCount = this.stats.receivedLikes;
+        const replyCount = this.stats.receivedReplies;
+        const quoteCount = this.stats.receivedQuotes;
         const topRepliedTo = [...this.stats.interactedWith].filter((interaction) => interaction.profile).slice(0, 10);
-        const topReposted = [...this.data.posts].sort((a, b) => (b.post.repostCount ?? 0)- (a.post.repostCount ?? 0)).slice(0, 5);
+        const topReposted = [...this.data.posts].sort((a, b) => (b.post.repostCount ?? 0) - (a.post.repostCount ?? 0)).slice(0, 5);
+        const topQuoted = [...this.data.posts].sort((a, b) => (b.post.quoteCount ?? 0) - (a.post.quoteCount ?? 0)).slice(0, 5);
         const topLiked = [...this.data.posts].sort((a, b) => (b.post.likeCount ?? 0) - (a.post.likeCount ?? 0)).slice(0, 5);
+        const topReplied = [...this.data.posts].sort((a, b) => (b.post.replyCount ?? 0) - (a.post.replyCount ?? 0)).slice(0, 5);
+        const summaries = this.stats.summary.split(">>>").filter(s => s.trim().length > 0);
+        const summarySerious = summaries[0] ? summaries[0].replaceAll(">", "").trim() : "";
+        const summaryHumorous = summaries[1] ? summaries[1].replaceAll(">", "").trim() : "";
 
         const statsDom = dom(html`<div class="">
             <div class="flex flex-col items-center">
@@ -212,8 +223,22 @@ class SkyStats extends LitElement {
             <div class="text-center text-lg flex flex-col">
                 <span>Posted <span class="text-primary">${postsCount}</span> skeets</span>
                 <span>Received <span class="text-primary">${repostsCount}</span> reposts</span>
+                <span>Received <span class="text-primary">${quoteCount}</span> quotes</span>
                 <span>Received <span class="text-primary">${likeCount}</span> likes</span>
+                <span>Received <span class="text-primary">${replyCount}</span> replies</span>
             </div>
+            ${summarySerious.trim().length > 0
+                ? html`
+                      <div class="font-bold text-xl underline mt-8 mb-4">Content Summary</div>
+                      <div class="whitespace-pre-wrap">${summarySerious}</div>
+                  `
+                : ""}
+            ${summaryHumorous.trim().length > 0
+                ? html`
+                      <div class="font-bold text-xl underline mt-8 mb-4">🤡 Summary</div>
+                      <div class="whitespace-pre-wrap">${summaryHumorous}</div>
+                  `
+                : ""}
             <div class="font-bold text-xl underline mt-8 mb-4">Replied the most to</div>
             ${map(
                 topRepliedTo,
@@ -226,7 +251,7 @@ class SkyStats extends LitElement {
                         ${interaction.profile!.avatar
                             ? html`<img class="w-[2em] h-[2em] rounded-full" src="${interaction.profile!.avatar}" />`
                             : defaultAvatar}
-                        <span class="text-primary">${interaction.profile!.displayName ?? interaction.profile!.handle}</span>
+                        <span>${interaction.profile!.displayName ?? interaction.profile!.handle}</span>
                     </a>
                     <span class="text-lg">${interaction.count} times</span>
                 </div> `
@@ -240,11 +265,23 @@ class SkyStats extends LitElement {
             <canvas id="postsPerTimeOfDay" class="mt-4"></canvas>
             <div class="font-bold text-xl underline mt-8">Posts per weekday</div>
             <canvas id="postsPerWeekday" class="mt-4"></canvas>
+            <div class="font-bold text-xl underline mt-8">Received likes per day</div>
+            <canvas id="likesPerDay" class="mt-4"></canvas>
+            <div class="font-bold text-xl underline mt-8">Received reposts per day</div>
+            <canvas id="repostsPerDay" class="mt-4"></canvas>
+            <div class="font-bold text-xl underline mt-8">Received quotes per day</div>
+            <canvas id="quotesPerDay" class="mt-4"></canvas>
+            <div class="font-bold text-xl underline mt-8">Received replies per day</div>
+            <canvas id="repliesPerDay" class="mt-4"></canvas>
 
             <div class="font-bold text-xl underline mt-8">Top 5 reposted posts</div>
             <div>${map(topReposted, (post) => renderPost(post))}</div>
             <div class="font-bold text-xl underline mt-8">Top 5 liked posts</div>
             <div>${map(topLiked, (post) => renderPost(post))}</div>
+            <div class="font-bold text-xl underline mt-8">Top 5 most replied to posts</div>
+            <div>${map(topReplied, (post) => renderPost(post))}</div>
+            <div class="font-bold text-xl underline mt-8">Top 5 most quoted posts</div>
+            <div>${map(topQuoted, (post) => renderPost(post))}</div>
         </div>`)[0];
 
         this.renderWordCloud(this.stats, statsDom.querySelector<HTMLCanvasElement>("#wordCloud"));
@@ -257,8 +294,10 @@ class SkyStats extends LitElement {
         if (!wordCloudCanvas || !this.stats) return;
         const words = stats.words.map((word) => word.text).slice(0, 100);
         const maxCount = stats.words.reduce((prevWord, word) => (prevWord.count < word.count ? word : prevWord)).count;
-        const wordFrequencies = stats.words.map((word) => 10 + (word.count / maxCount) * 72).slice(0, 100);
+        const wordFrequencies = stats.words.map((word) => 12 + (word.count / maxCount) * 72).slice(0, 100);
+        const maxSize = 82;
         let ctx = wordCloudCanvas.getContext("2d");
+
         if (ctx) {
             new Chart(ctx, {
                 type: WordCloudController.id,
@@ -267,6 +306,10 @@ class SkyStats extends LitElement {
                     datasets: [
                         {
                             data: wordFrequencies,
+                            color: wordFrequencies.map((w) => {
+                                const scale = w / maxSize;
+                                return `hsl(210, ${50 + scale * 30}%, ${85 - scale * 40}%)`;
+                            }),
                         },
                     ],
                 },
@@ -278,6 +321,12 @@ class SkyStats extends LitElement {
                         legend: {
                             display: false,
                         },
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 1000,
+                        easing: "easeInOutQuart",
                     },
                 },
             });
@@ -358,6 +407,90 @@ class SkyStats extends LitElement {
                     datasets: [
                         {
                             data: postsPerWeekday,
+                            backgroundColor: "rgba(75, 192, 192, 0.2)",
+                            borderColor: "rgba(75, 192, 192, 1)",
+                            borderWidth: 1,
+                        },
+                    ],
+                },
+                options: chartOptions,
+            });
+        }
+
+        const likesPerDayCanvas = statsDom.querySelector("#likesPerDay") as HTMLCanvasElement;
+        const likesPerDay = dates.map((day) => (stats.likesPerDate[day] ? stats.likesPerDate[day] : 0));
+        ctx = likesPerDayCanvas.getContext("2d");
+        if (ctx) {
+            new Chart(ctx, {
+                type: "bar",
+                data: {
+                    labels: dates,
+                    datasets: [
+                        {
+                            data: likesPerDay,
+                            backgroundColor: "rgba(75, 192, 192, 0.2)",
+                            borderColor: "rgba(75, 192, 192, 1)",
+                            borderWidth: 1,
+                        },
+                    ],
+                },
+                options: chartOptions,
+            });
+        }
+
+        const repostsPerDayCanvas = statsDom.querySelector("#repostsPerDay") as HTMLCanvasElement;
+        const repostsPerDay = dates.map((day) => (stats.repostsPerDate[day] ? stats.repostsPerDate[day] : 0));
+        ctx = repostsPerDayCanvas.getContext("2d");
+        if (ctx) {
+            new Chart(ctx, {
+                type: "bar",
+                data: {
+                    labels: dates,
+                    datasets: [
+                        {
+                            data: repostsPerDay,
+                            backgroundColor: "rgba(75, 192, 192, 0.2)",
+                            borderColor: "rgba(75, 192, 192, 1)",
+                            borderWidth: 1,
+                        },
+                    ],
+                },
+                options: chartOptions,
+            });
+        }
+
+        const quotesPerDayCanvas = statsDom.querySelector("#quotesPerDay") as HTMLCanvasElement;
+        const quotesPerDay = dates.map((day) => (stats.quotesPerDate[day] ? stats.quotesPerDate[day] : 0));
+        ctx = quotesPerDayCanvas.getContext("2d");
+        if (ctx) {
+            new Chart(ctx, {
+                type: "bar",
+                data: {
+                    labels: dates,
+                    datasets: [
+                        {
+                            data: quotesPerDay,
+                            backgroundColor: "rgba(75, 192, 192, 0.2)",
+                            borderColor: "rgba(75, 192, 192, 1)",
+                            borderWidth: 1,
+                        },
+                    ],
+                },
+                options: chartOptions,
+            });
+        }
+
+        const repliesPerDayCanvas = statsDom.querySelector("#repliesPerDay") as HTMLCanvasElement;
+        const repliesPerDay = dates.map((day) => (stats.repliesPerDate[day] ? stats.repliesPerDate[day] : 0));
+        ctx = repliesPerDayCanvas.getContext("2d");
+        if (ctx) {
+            new Chart(ctx, {
+                type: "bar",
+                data: {
+                    labels: dates,
+                    datasets: [
+                        {
+                            data: repliesPerDay,
                             backgroundColor: "rgba(75, 192, 192, 0.2)",
                             borderColor: "rgba(75, 192, 192, 1)",
                             borderWidth: 1,

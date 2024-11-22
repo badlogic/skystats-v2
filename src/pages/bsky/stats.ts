@@ -5,6 +5,7 @@ import { Feed } from "@atproto/api/dist/client/types/app/bsky/feed/describeFeedG
 import { deu, eng, fra, removeStopwords } from "stopword";
 import { AppBskyFeedDefs, AppBskyFeedPost } from "@atproto/api";
 import { replaceSpecialChars } from "../../utils/utils";
+import { Api } from "../../api";
 
 type Interaction = { count: number; did: string; profile?: ProfileViewBasic };
 
@@ -14,10 +15,17 @@ export interface Stats {
     postsPerDate: Record<string, FeedViewPost[]>;
     postsPerTimeOfDay: Record<string, FeedViewPost[]>;
     postsPerWeekday: Record<string, FeedViewPost[]>;
+    likesPerDate: Record<string, number>;
+    repostsPerDate: Record<string, number>;
+    quotesPerDate: Record<string, number>;
+    repliesPerDate: Record<string, number>;
     interactedWith: Interaction[];
     words: Word[];
     receivedReposts: number;
+    receivedQuotes: number;
     receivedLikes: number;
+    receivedReplies: number;
+    summary: string;
 }
 
 function generateDates(numDays: number): string[] {
@@ -63,10 +71,17 @@ export async function calculateStats(data: ProfileData) {
         postsPerDate: {},
         postsPerWeekday: {},
         postsPerTimeOfDay: {},
+        likesPerDate: {},
+        repostsPerDate: {},
+        quotesPerDate: {},
+        repliesPerDate: {},
         interactedWith: [],
         words: [],
         receivedReposts: 0,
-        receivedLikes: 0
+        receivedQuotes: 0,
+        receivedLikes: 0,
+        receivedReplies: 0,
+        summary: ""
     }
     const weekdays = generateWeekdays();
     const hours = generateHours();
@@ -85,6 +100,10 @@ export async function calculateStats(data: ProfileData) {
             stats.postsPerDate[date] = array;
         }
         array.push(post);
+        stats.likesPerDate[date] = (stats.likesPerDate[date] ?? 0) + (post.post.likeCount ?? 0);
+        stats.repostsPerDate[date] = (stats.repostsPerDate[date] ?? 0) + (post.post.repostCount ?? 0);
+        stats.quotesPerDate[date] = (stats.quotesPerDate[date] ?? 0) + (post.post.quoteCount ?? 0);
+        stats.repliesPerDate[date] = (stats.repliesPerDate[date] ?? 0) + (post.post.replyCount ?? 0);
 
         const hour = new Date(record.createdAt).getHours();
         const hourKey = (hour < 10 ? "0" : "") + hour + ":00";
@@ -156,7 +175,25 @@ export async function calculateStats(data: ProfileData) {
     for (const post of data.posts) {
         stats.receivedLikes += post.post.likeCount ?? 0;
         stats.receivedReposts += post.post.repostCount ?? 0;
+        stats.receivedQuotes += post.post.quoteCount ?? 0;
+        stats.receivedReplies += post.post.replyCount ?? 0;
     }
 
+    const texts: string[] = [];
+    const scorePost = (post: FeedViewPost) => (post.post.repostCount ?? 0) + (post.post.likeCount ?? 0) + (post.post.quoteCount ?? 0);
+    const postsForLLM = [...data.posts].sort((a, b) => scorePost(b) - scorePost(a)).slice(0, 100);
+    for (const post of postsForLLM) {
+        const record = post.post.record;
+        texts.push(AppBskyFeedPost.isRecord(record) ? record.text : "");
+    }
+
+    if (postsForLLM.length > 0) {
+        const response = await Api.summarize(postsForLLM[0].post.uri, texts);
+        if (response instanceof Error) {
+            console.error("Could not generate AI summary: " + response.message);
+            return stats;
+        }
+        stats.summary = response.summary;
+    }
     return stats;
 }

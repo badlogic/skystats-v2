@@ -39,16 +39,20 @@ export async function apiGetText(endpoint: string): Promise<string | Error> {
     }
 }
 
-export async function apiPost<T>(endpoint: string, params: URLSearchParams | FormData) {
+export async function apiPost<T>(endpoint: string, params: URLSearchParams | FormData | JsonValue) {
     let headers: HeadersInit = {};
     let body: string | FormData;
 
     if (params instanceof URLSearchParams) {
         headers = { "Content-Type": "application/x-www-form-urlencoded" };
         body = params.toString();
-    } else {
+    } else if (params instanceof FormData) {
         body = params;
+    } else {
+        headers = { "Content-Type": "application/json" };
+        body = JSON.stringify(params);
     }
+
     try {
         const result = await fetch(apiBaseUrl() + endpoint, {
             method: "POST",
@@ -81,5 +85,9 @@ export function toUrlBody(params: JsonValue) {
 export class Api {
     static async hello() {
         return apiGet<{ message: string }>("hello");
+    }
+
+    static async summarize(key: string, posts: string[]) {
+        return apiPost<{summary: string}>("summarize", { key, posts });  // Wrap posts array in an object
     }
 }

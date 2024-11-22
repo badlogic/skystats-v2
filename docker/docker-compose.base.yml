@@ -21,9 +21,7 @@ services:
         stop_grace_period: 0s
         environment:
             PORT: 3333
-            DATABASE: ${SKYSTATS-V2_DB}
-            DATABASE_USER: ${SKYSTATS-V2_DB_USER}
-            DATABASE_PASSWORD: ${SKYSTATS-V2_DB_PASSWORD}
+            OPENAI_KEY: ${SKYSTATS_OPENAI_KEY}
         volumes:
             - ./data:/data
             - ../:/app
