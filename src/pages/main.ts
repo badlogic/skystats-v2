@@ -187,7 +187,8 @@ class SkyStats extends LitElement {
                 <a href="https://skystats.mariozechner.at" target="_blank">Skystats</a>
                 is lovingly made by
                 <a href="https://bsky.app/profile/badlogic.bsky.social" target="_blank">Mario Zechner</a><br />
-                No data is collected, not even your IP address.<br />
+                Analyzed posts are sent to OpenAI for summarization, who may store the data for up to 30 days, but will not share it or use it for training or improving their services or models.</br>
+                No data is collected by Skystats itself, not even your IP address.<br />
                 <a href="https://github.com/badlogic/skystats-v2" target="_blank">Source code</a>
             </div>
         </main>`;
