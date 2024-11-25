@@ -37,10 +37,11 @@ if (!openaiKey) {
 
     app.post("/api/summarize", async (req, res) => {
         try {
-            const body: { key: string, posts: string[] } = req.body;
-            const summary = summaryCache[body.key] ? summaryCache[body.key] : await summarize(body.posts);
+            const body: { key: string, posts: string[], language: string } = req.body;
+            const key = body.key + body.language;
+            const summary = summaryCache[key] ? summaryCache[key] : await summarize(body.posts, body.language);
             if (summary) {
-                summaryCache[body.key] = summary;
+                summaryCache[key] = summary;
             }
             res.json({ summary });
         } catch (e) {

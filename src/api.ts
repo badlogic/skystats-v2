@@ -87,7 +87,7 @@ export class Api {
         return apiGet<{ message: string }>("hello");
     }
 
-    static async summarize(key: string, posts: string[]) {
-        return apiPost<{summary: string}>("summarize", { key, posts });  // Wrap posts array in an object
+    static async summarize(key: string, posts: string[], language: string) {
+        return apiPost<{summary: string}>("summarize", { key, posts, language});
     }
 }

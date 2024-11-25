@@ -1,4 +1,4 @@
-import { LitElement, PropertyValueMap, TemplateResult, html } from "lit";
+import { LitElement, PropertyValueMap, PropertyValues, TemplateResult, html } from "lit";
 import { map } from "lit-html/directives/map.js";
 import { customElement, state } from "lit/decorators.js";
 import { getProfileData, ProfileData } from "./bsky/data";
@@ -53,6 +53,39 @@ export class ThemeToggle extends LitElement {
     }
 }
 
+interface Language {
+    code: string;
+    name: string;
+}
+
+function populateLanguageSelect(selectElement: HTMLSelectElement | null) {
+    if (!selectElement) return;
+
+    const languages: Language[] = [
+        { code: "en", name: "English" },
+        { code: "es", name: "Spanish" },
+        { code: "fr", name: "French" },
+        { code: "de", name: "German" },
+        { code: "it", name: "Italian" },
+        { code: "pt", name: "Portuguese" },
+        { code: "ru", name: "Russian" },
+        { code: "zh", name: "Chinese" },
+        { code: "ja", name: "Japanese" },
+        { code: "ko", name: "Korean" },
+    ];
+
+    const currentLang = navigator.language.split("-")[0];
+    const currentLangName = new Intl.DisplayNames([currentLang], { type: 'language' }).of(currentLang);
+
+    if (!languages.some(lang => lang.code === currentLang)) {
+        languages.unshift({ code: currentLang, name: currentLangName || currentLang });
+    }
+
+    selectElement.innerHTML = languages
+        .map((lang) => `<option value="${lang.code}" ${lang.code === currentLang ? "selected" : ""}>${lang.name}</option>`)
+        .join("");
+}
+
 @customElement("sky-stats")
 class SkyStats extends LitElement {
     @state()
@@ -60,6 +93,9 @@ class SkyStats extends LitElement {
 
     @state()
     days = 30;
+
+    @state()
+    language = "English";
 
     @state()
     loading = false;
@@ -82,6 +118,7 @@ class SkyStats extends LitElement {
         } catch (e) {
             this.days = 30;
         }
+        this.language = new URL(location.href).searchParams.get("language") ?? "English";
     }
 
     protected createRenderRoot(): Element | ShadowRoot {
@@ -94,6 +131,10 @@ class SkyStats extends LitElement {
             if (this.handle) this.load();
             this.firstUpdate = false;
         }
+    }
+
+    protected firstUpdated(_changedProperties: PropertyValues): void {
+        populateLanguageSelect(this.querySelector<HTMLSelectElement>("#language"));
     }
 
     async load() {
@@ -114,7 +155,7 @@ class SkyStats extends LitElement {
         }
 
         if (this.data) {
-            const result = await calculateStats(this.data);
+            const result = await calculateStats(this.data, this.language || "English");
             if (result instanceof Error) {
                 this.error = result.message;
             } else {
@@ -129,9 +170,12 @@ class SkyStats extends LitElement {
         if (!accountElement) return;
         const daysElement = this.querySelector<HTMLInputElement>("#days");
         if (!daysElement) return;
+        const languageElement = this.querySelector<HTMLInputElement>("#language");
+        if (!languageElement) return;
         const newUrl = new URL(location.href);
         newUrl.searchParams.set("handle", accountElement.value.trim() ?? "");
         newUrl.searchParams.set("days", daysElement.value ?? "30");
+        newUrl.searchParams.set("language", languageElement.value ?? "en");
         location.href = newUrl.href;
     }
 
@@ -162,13 +206,17 @@ class SkyStats extends LitElement {
                     />
                     day(s)</label
                 >
+                <label class="mt-2"
+                    >Summary language
+                    <select id="language" class="bg-transparent text-center border rounded outline-none p-1 border-gray/75"></select
+                ></label>
                 <div class="w-full flex mt-4">
                     <input
                         id="account"
                         class="flex-1 bg-none border-l border-t border-b border-gray/75 outline-none rounded-l text-black px-2 py-2"
                         placeholder="Account, e.g. badlogic.bsky.social"
                     />
-                    <button class="align-center rounded-r bg-primary text-white px-4" @click=${this.viewAccount}>View</button>
+                    <button class="align-center rounded-r bg-primary text-[#fff] px-4" @click=${this.viewAccount}>View</button>
                 </div>
             </div>`;
         }
@@ -233,7 +281,11 @@ class SkyStats extends LitElement {
                 ? html`
                       <div class="font-bold text-xl underline mt-8 mb-4">Content Summary</div>
                       <div class="text-muted-fg text-sm mb-2">
-                          This summary is AI-generated based on top 100 posts by engagement (<a href="https://github.com/badlogic/skystats-v2/blob/main/src/server/llm.ts#L33-L48">Prompt</a>). As with all AI models, it may contain errors and misrepresent users' statements. This is experimental - interpret with caution.
+                          This summary is AI-generated based on top 100 posts by engagement (<a
+                              href="https://github.com/badlogic/skystats-v2/blob/main/src/server/llm.ts#L33-L48"
+                              >Prompt</a
+                          >). As with all AI models, it may contain errors and misrepresent users' statements. This is experimental - interpret with
+                          caution.
                       </div>
                       <div class="whitespace-pre-wrap">${summarySerious}</div>
                   `
@@ -242,7 +294,11 @@ class SkyStats extends LitElement {
                 ? html`
                       <div class="font-bold text-xl underline mt-8 mb-4">🤡 Summary</div>
                       <div class="text-muted-fg text-sm mb-2">
-                          This summary is AI-generated based on top 100 posts by engagement (<a href="https://github.com/badlogic/skystats-v2/blob/main/src/server/llm.ts#L33-L48">Prompt</a>). As with all AI models, it may contain errors and misrepresent users' statements. This is experimental - interpret with caution.
+                          This summary is AI-generated based on top 100 posts by engagement (<a
+                              href="https://github.com/badlogic/skystats-v2/blob/main/src/server/llm.ts#L33-L48"
+                              >Prompt</a
+                          >). As with all AI models, it may contain errors and misrepresent users' statements. This is experimental - interpret with
+                          caution.
                       </div>
                       <div class="whitespace-pre-wrap">${summaryHumorous}</div>
                   `

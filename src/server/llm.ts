@@ -16,7 +16,7 @@ const temperature = 0.75;
 const enc = getEncoding("cl100k_base");
 const getNumTokens = (message: string) => enc.encode(message).length;
 
-export async function summarize(texts: string[]) {
+export async function summarize(texts: string[], language: string) {
     let concatenatedTexts = "";
     let numTokens = 0;
 
@@ -46,7 +46,7 @@ export async function summarize(texts: string[]) {
     phrases like "swiss army knife", "roller coaster", "buffet", "Welcome to the ... world", "soap opera", "grab your popcorn", and so on. Stay away from bland, stereotypical
     analogies.
 
-    Only output the summaries as instructed. Write in English. Do not output headers like "Serious Summary:" or similar.
+    Only output the summaries as instructed. Write the summaries in this BCP 47 format language: ${language}. Do not output headers like "Serious Summary:" or similar.
     `
     const messages: ChatCompletionMessageParam[] = [{
         role: "system",

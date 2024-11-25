@@ -28,23 +28,6 @@ export interface Stats {
     summary: string;
 }
 
-function generateDates(numDays: number): string[] {
-    const dateArray: string[] = [];
-
-    for (let i = 0; i < numDays; i++) {
-        const currentDate = new Date();
-        currentDate.setDate(currentDate.getDate() - i);
-
-        const year = currentDate.getFullYear();
-        const month = (currentDate.getMonth() + 1).toString().padStart(2, "0");
-        const day = currentDate.getDate().toString().padStart(2, "0");
-
-        dateArray.push(`${year}-${month}-${day}`);
-    }
-
-    return dateArray.reverse();
-}
-
 function generateHours(): string[] {
     const hours: string[] = [];
     for (let i = 0; i < 24; i++) {
@@ -66,7 +49,7 @@ function getYearMonthDate(dateString: string): string {
     return `${year}-${month}-${day}`;
 }
 
-export async function calculateStats(data: ProfileData) {
+export async function calculateStats(data: ProfileData, language: string) {
     const stats: Stats = {
         postsPerDate: {},
         postsPerWeekday: {},
@@ -188,7 +171,7 @@ export async function calculateStats(data: ProfileData) {
     }
 
     if (postsForLLM.length > 0) {
-        const response = await Api.summarize(postsForLLM[0].post.uri, texts);
+        const response = await Api.summarize(postsForLLM[0].post.uri, texts, language);
         if (response instanceof Error) {
             console.error("Could not generate AI summary: " + response.message);
             return stats;
