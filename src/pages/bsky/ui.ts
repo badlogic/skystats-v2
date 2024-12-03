@@ -36,7 +36,7 @@ class HlsVideo extends LitElement {
     }
 
     protected render(): unknown {
-        return html`<video class="w-full" controls></video>`;
+        return html`<video class="w-full border border-gray-300 rounded-lg max-h-[400px]" controls></video>`;
     }
 }
 
@@ -59,7 +59,7 @@ export class TextOverlay extends LitElement {
         return html`<div class="relative">
             <button @click=${() => (this.show = !this.show)} class="rounded bg-hinted-fg p-1 text-white text-xs">${this.buttonText}</button>
             ${this.show
-                ? html`<button @click=${() => (this.show = !this.show)} class="absolute bg-black text-white p-4 rounded-lg borderd">
+                ? html`<button @click=${() => (this.show = !this.show)} class="left-0 top-0 absolute bg-black text-white p-4 rounded-lg" style="z-index: 100">
                       <div class="w-[250px]">${this.text}</div>
                   </button>`
                 : nothing}
@@ -136,44 +136,44 @@ function renderEmbeddedRecord(record: AppBskyEmbedRecord.View["record"]): Return
         const postText =
             record.value && AppBskyFeedPost.isRecord(record.value) ? unsafeHTML(processText(record.value)) : html`<div>Unsupported record type</div>`;
         const embed = renderEmbed(record.embeds ? record.embeds[0] : undefined);
-        return html`<div class="rounded-lg border mt-4 p-4">
+        return html`<div class="rounded-lg border border-gray-300 mt-4 p-4">
             ${renderPostHeader(record.author, record.uri, record.indexedAt, true)}
             <div class="mb-2">${postText}</div>
             ${embed}
         </div>`;
     } else if (AppBskyEmbedRecord.isViewNotFound(record)) {
-        return html`<div class="rounded-lg border mt-4 p-4 text-red-500">Post not found</div>`;
+        return html`<div class="rounded-lg border border-gray-300 mt-4 p-4 text-red-500">Post not found</div>`;
     } else if (AppBskyEmbedRecord.isViewBlocked(record)) {
-        return html`<div class="rounded-lg border mt-4 p-4 text-yellow-500">This content is blocked</div>`;
+        return html`<div class="rounded-lg border border-gray-300 mt-4 p-4 text-yellow-500">This content is blocked</div>`;
     } else if (AppBskyEmbedRecord.isViewDetached(record)) {
-        return html`<div class="rounded-lg border mt-4 p-4 text-gray-500">Content no longer available</div>`;
+        return html`<div class="rounded-lg border border-gray-300 mt-4 p-4 text-gray-500">Content no longer available</div>`;
     } else if (AppBskyFeedDefs.isGeneratorView(record)) {
-        return html`<div class="rounded-lg border mt-4 p-4 bg-blue-50 p-4">Feed Generator: ${record.displayName}</div>`;
+        return html`<div class="rounded-lg border border-gray-300 mt-4 p-4 bg-blue-50 p-4">Feed Generator: ${record.displayName}</div>`;
     } else if (AppBskyGraphDefs.isListView(record)) {
-        return html`<div class="flex flex-col items-centered rounded-lg border mt-4 p-4 p-4">
+        return html`<div class="flex flex-col items-centered rounded-lg border border-gray-300 mt-4 p-4 p-4">
                 <h2>${record.name ?? "(No name given)"}</h2>
                 <div>${record.description ?? "(No description given)"}</div>
-                <div class="mt-4 flex gap-2 text-muted-fg text-sm"><span>A list by</span> ${renderProfile(record.creator, true)}</div>
+                <div class="mt-4 flex gap-2 text-gray-400 text-sm"><span>A list by</span> ${renderProfile(record.creator, true)}</div>
             </div>
         </div>`
     } else if (AppBskyLabelerDefs.isLabelerView(record)) {
-        return html`<div class="rounded-lg border mt-4 p-4 bg-green-50 p-4">Labeler: ${record.displayName}</div>`;
+        return html`<div class="rounded-lg border border-gray-300 mt-4 p-4 bg-green-50 p-4">Labeler: ${record.displayName}</div>`;
     } else if (AppBskyGraphDefs.isStarterPackViewBasic(record)) {
-        return html`<div class="flex flex-col items-centered rounded-lg border mt-4 p-4 p-4">
+        return html`<div class="flex flex-col items-centered rounded-lg border border-gray-300 mt-4 p-4 p-4">
                 <h2>${(record.record as any).name ?? "(No name given)"}</h2>
                 <div>${(record.record as any).description ?? "(No description given)"}</div>
-                <div class="mt-4 flex gap-2 text-muted-fg text-sm"><span>A started pack by</span> ${renderProfile(record.creator, true)}</div>
+                <div class="mt-4 flex gap-2 text-gray-400 text-sm"><span>A started pack by</span> ${renderProfile(record.creator, true)}</div>
             </div>
         </div>`;
     } else {
-        return html`<div class="rounded-lg border mt-4 p-4 text-red-500">Unknown embedded record type: ${record.$type}</div>`;
+        return html`<div class="rounded-lg border border-gray-300 mt-4 p-4 text-red-500">Unknown embedded record type: ${record.$type}</div>`;
     }
 }
 
 function renderEmbeddedimages(images: AppBskyEmbedImages.View) {
     return html`<div class="flex flex-col gap-2">${images.images.map((img) =>
-        html`<div class="rounded-lg relative flex flex-col items-center">
-            <img class="w-full rounded-lg" src="${img.thumb}" alt="${img.alt}" />
+        html`<div class="rounded-lg relative flex flex-col items-center gap-2">
+            <img class="w-full rounded-lg border border-gray-300" src="${img.thumb}" alt="${img.alt}" />
             ${img.alt && img.alt.length > 0
                             ? html`<text-overlay buttonText="ALT" text="${img.alt}" class="absolute left-1 bottom-1 cursor-pointer">
                               </text-overlay>`
@@ -186,7 +186,7 @@ export const defaultAvatar = svg`<svg width="32" height="32" viewBox="0 0 24 24"
 function renderProfile(profile: ProfileViewBasic, small: boolean = false) {
     if (!small) {
         return html`<a class="flex items-center gap-2" href="https://bsky.app/profile/${profile.handle ?? profile.did}" target="_blank">
-            ${profile.avatar ? html`<img class="w-[2em] h-[2em] rounded-full" src="${profile.avatar}" />` : defaultAvatar}
+            ${profile.avatar ? html`<img class="w-10 h-10 shadow-lg rounded-full" src="${profile.avatar}" />` : defaultAvatar}
             <span>${profile.displayName ?? profile.handle}</span>
         </a>`;
     } else {
@@ -212,11 +212,11 @@ function renderEmbed(embed: PostView["embed"] | undefined): ReturnType<typeof ht
             `;
         } else if (AppBskyEmbedExternal.isView(embed)) {
             return html`
-                <a href="${embed.external.uri}" class="border rounded-lg" target="_blank" style="display: block">
+                <a href="${embed.external.uri}" class="border border-gray-300 rounded-lg" target="_blank" style="display: block">
                     ${embed.external.thumb ? html`<img class="rounded-t-lg" src="${embed.external.thumb}" alt="${embed.external.title}" />` : html``}
-                    <div class="p-4 ${embed.external.thumb ? "border-t border-muted" : ""}">
-                        <div class="text-primary-fg truncate">${embed.external.title}</div>
-                        <div class="text-xs text-muted-fg truncate">${embed.external.uri}</div>
+                    <div class="p-4 ${embed.external.thumb ? "border-t border-gray-300" : ""}">
+                        <div class="text-gray-700 truncate">${embed.external.title}</div>
+                        <div class="text-xs text-gray-400 truncate">${embed.external.uri}</div>
                     </div>
                 </a>
             `;
@@ -247,7 +247,7 @@ export function renderPost(post: FeedViewPost): ReturnType<typeof html> {
     let inReplyTo: ReturnType<typeof html> = html``;
     if (post.reply) {
         if (AppBskyFeedDefs.isPostView(post.reply.parent)) {
-            inReplyTo = html`<div class="flex items-center gap-2 text-xs text-muted-fg mb-2"><div>In reply to</div>${renderProfile(post.reply.parent.author)}</div>`
+            inReplyTo = html`<div class="flex items-center gap-2 text-xs text-gray-400 mb-2"><div>In reply to</div>${renderProfile(post.reply.parent.author)}</div>`
         }
     }
 
@@ -261,7 +261,7 @@ export function renderPost(post: FeedViewPost): ReturnType<typeof html> {
         }
     };
 
-    return html`<div class="rounded-lg border mt-4 p-4 cursor-pointer w-full" @click=${(ev: Event) => postClicked(ev)}>
+    return html`<div class="cursor-pointer w-full" @click=${(ev: Event) => postClicked(ev)}>
         ${renderPostHeader(post.post.author, post.post.uri, record.createdAt, false)}
         ${inReplyTo}
         <div class="mb-2">${postText}</div>

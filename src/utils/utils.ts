@@ -1,3 +1,5 @@
+import {deflate, inflate} from "pako";
+
 export function formatBytes(bytes: number, decimals: number = 2, specifier = true) {
     if (bytes === 0) return specifier ? "0 Bytes" : "0";
 
@@ -196,3 +198,27 @@ export function getTimeDifferenceString(inputDate: string): string {
     }
 }
 
+export const compressJSON = <T>(data: T): string => {
+    try {
+      const jsonString = JSON.stringify(data);
+      const uint8Array = new TextEncoder().encode(jsonString);
+      const compressed = deflate(uint8Array);
+      return btoa(Array.from(compressed).map(byte => String.fromCharCode(byte)).join(''));
+    } catch (error) {
+      console.error('Compression failed:', error);
+      throw error;
+    }
+  };
+
+  export const decompressJSON = <T>(compressedData: string): T => {
+    try {
+      const binaryString = atob(compressedData);
+      const uint8Array = Uint8Array.from(binaryString, char => char.charCodeAt(0));
+      const decompressed = inflate(uint8Array);
+      const jsonString = new TextDecoder().decode(decompressed);
+      return JSON.parse(jsonString);
+    } catch (error) {
+      console.error('Decompression failed:', error);
+      throw error;
+    }
+  };

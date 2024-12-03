@@ -73,6 +73,6 @@ export class Store {
     }
 }
 
-const theme = Store.getTheme();
+/*const theme = Store.getTheme();
 if (theme == "dark") document.documentElement.classList.add("dark");
-else document.documentElement.classList.remove("dark");
+else document.documentElement.classList.remove("dark");*/

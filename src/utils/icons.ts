@@ -27,6 +27,8 @@ import checkmarkIconSvg from "remixicon/icons/System/check-line.svg";
 // @ts-ignore
 import githubIconSvg from "remixicon/icons/Logos/github-line.svg";
 // @ts-ignore
+import blueskyIconSvg from "remixicon/icons/Logos/bluesky-line.svg";
+// @ts-ignore
 import heartIconSvg from "remixicon/icons/Health & Medical/heart-line.svg";
 // @ts-ignore
 import heartFilledIconSvg from "remixicon/icons/Health & Medical/heart-fill.svg";
@@ -137,6 +139,7 @@ export const imageIcon = unsafeHTML(imageIconSvg);
 export const bellIcon = unsafeHTML(bellIconSvg);
 export const checkmarkIcon = unsafeHTML(checkmarkIconSvg);
 export const githubIcon = unsafeHTML(githubIconSvg);
+export const blueskyIcon = unsafeHTML(blueskyIconSvg);
 export const heartIcon = unsafeHTML(heartIconSvg);
 export const heartFilledIcon = unsafeHTML(heartFilledIconSvg);
 export const editIcon = unsafeHTML(editIconSvg);
