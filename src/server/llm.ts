@@ -16,7 +16,7 @@ const temperature = 0.75;
 const enc = getEncoding("cl100k_base");
 const getNumTokens = (message: string) => enc.encode(message).length;
 
-export async function summarize(texts: string[], language: string) {
+export async function summarize(texts: string[], language: string, brutal: boolean) {
     let concatenatedTexts = "";
     let numTokens = 0;
 
@@ -42,9 +42,11 @@ export async function summarize(texts: string[], language: string) {
     The serious summary should highlight topics the account discusses. Readers of the summary should get a good idea what
     specific topics they can expect from the account.
 
-    The humorous summary can make fun of the account, but should not be mean, discriminatory, or otherwise offensive or hurtful. Do not use
+${ !brutal ?
+    `The humorous summary can make fun of the account, but should absolutely not be mean, discriminatory, or otherwise offensive or hurtful. Do not use
     phrases like "swiss army knife", "roller coaster", "buffet", "Welcome to the ... world", "soap opera", "grab your popcorn", and so on. Stay away from bland, stereotypical
-    analogies.
+    analogies. Do not be mean!`:
+    `The humorous summary must be brutally honest. Roast the person hard. Be specific.`}
 
     Only output the summaries as instructed. Write the summaries in this BCP 47 format language: ${language}. Do not output headers like "Serious Summary:" or similar.
     `

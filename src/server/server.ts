@@ -28,6 +28,16 @@ if (!openaiKey) {
     app.use(json());
     app.use(bodyParser.urlencoded({ extended: true }));
 
+    const BLOCKED_BOTS = ["googlebot", "bingbot", "yandexbot", "baiduspider"];
+
+    app.use((req, res, next) => {
+        const userAgent = req.get("User-Agent")?.toLowerCase() || "";
+        if (BLOCKED_BOTS.some((bot) => userAgent.includes(bot))) {
+            return res.status(403).send("Not allowed");
+        }
+        next();
+    });
+
     let summaryCache: Record<string, string> = {};
 
     app.get("/api/clear", (req, res) => {
@@ -37,9 +47,9 @@ if (!openaiKey) {
 
     app.post("/api/summarize", async (req, res) => {
         try {
-            const body: { key: string, posts: string[], language: string } = req.body;
-            const key = body.key + body.language;
-            const summary = summaryCache[key] ? summaryCache[key] : await summarize(body.posts, body.language);
+            const body: { key: string; posts: string[]; language: string, brutal?: boolean } = req.body;
+            const key = body.key + body.language + body.brutal;
+            const summary = summaryCache[key] ? summaryCache[key] : await summarize(body.posts, body.language, body.brutal == true);
             if (summary) {
                 summaryCache[key] = summary;
             }

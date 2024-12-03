@@ -98,6 +98,9 @@ class SkyStats extends LitElement {
     language = "English";
 
     @state()
+    brutal = false;
+
+    @state()
     loading = false;
 
     @state()
@@ -119,6 +122,7 @@ class SkyStats extends LitElement {
             this.days = 30;
         }
         this.language = new URL(location.href).searchParams.get("language") ?? "English";
+        this.brutal = new URL(location.href).searchParams.get("brutal") == "true";
     }
 
     protected createRenderRoot(): Element | ShadowRoot {
@@ -155,7 +159,7 @@ class SkyStats extends LitElement {
         }
 
         if (this.data) {
-            const result = await calculateStats(this.data, this.language || "English");
+            const result = await calculateStats(this.data, this.language || "English", this.brutal);
             if (result instanceof Error) {
                 this.error = result.message;
             } else {
@@ -172,10 +176,13 @@ class SkyStats extends LitElement {
         if (!daysElement) return;
         const languageElement = this.querySelector<HTMLInputElement>("#language");
         if (!languageElement) return;
-        const newUrl = new URL(location.href);
+        const brutalElement = this.querySelector<HTMLInputElement>("#brutal");
+        if (!brutalElement) return;
+        const newUrl =new URL(location.href);
         newUrl.searchParams.set("handle", accountElement.value.trim() ?? "");
         newUrl.searchParams.set("days", daysElement.value ?? "30");
         newUrl.searchParams.set("language", languageElement.value ?? "en");
+        newUrl.searchParams.set("brutal", brutalElement.checked == true ? "true" : "false");
         location.href = newUrl.href;
     }
 
@@ -210,6 +217,10 @@ class SkyStats extends LitElement {
                     >Summary language
                     <select id="language" class="bg-transparent text-center border rounded outline-none p-1 border-gray/75"></select
                 ></label>
+                <label class="flex items-center gap-2 mt-2">
+                    <input id="brutal" type="checkbox" />
+                    Old meany summary
+                </label>
                 <div class="w-full flex mt-4">
                     <input
                         id="account"

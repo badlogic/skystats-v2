@@ -49,7 +49,7 @@ function getYearMonthDate(dateString: string): string {
     return `${year}-${month}-${day}`;
 }
 
-export async function calculateStats(data: ProfileData, language: string) {
+export async function calculateStats(data: ProfileData, language: string, brutal: boolean) {
     const stats: Stats = {
         postsPerDate: {},
         postsPerWeekday: {},
@@ -171,7 +171,7 @@ export async function calculateStats(data: ProfileData, language: string) {
     }
 
     if (postsForLLM.length > 0) {
-        const response = await Api.summarize(postsForLLM[0].post.uri, texts, language);
+        const response = await Api.summarize(postsForLLM[0].post.uri, texts, language, brutal);
         if (response instanceof Error) {
             console.error("Could not generate AI summary: " + response.message);
             return stats;
