@@ -8,11 +8,16 @@ commit_hash=$(git rev-parse HEAD)
 echo "{\"date\": \"$current_date\", \"commit\": \"$commit_hash\"}" > html/version.json
 
 ssh -t $host "mkdir -p $host_dir/docker/data/postgres"
+# Create .env file locally in docker directory
+cat > docker/.env << EOF
+SKYSTATS_OPENAI_KEY=$SKYSTATS_OPENAI_KEY
+EOF
+
 rsync -avz --exclude node_modules --exclude .git --exclude data --exclude docker/data ./ $host:$host_dir
 
 if [ "$1" == "server" ]; then
     echo "Publishing client & server"
-    ssh -t $host "cd $host_dir && export SKYSTATS_OPENAI_KEY=$SKYSTATS_OPENAI_KEY && ./docker/control.sh stop && ./docker/control.sh start && ./docker/control.sh logs"
+    ssh -t $host "cd $host_dir && ./docker/control.sh stop && ./docker/control.sh start && ./docker/control.sh logs"
 else
     echo "Publishing client only"
 fi

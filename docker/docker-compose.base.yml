@@ -19,6 +19,7 @@ services:
             context: .
             dockerfile: Dockerfile
         stop_grace_period: 0s
+        env_file: .env
         environment:
             PORT: 3333
             OPENAI_KEY: ${SKYSTATS_OPENAI_KEY}
