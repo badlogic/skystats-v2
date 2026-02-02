@@ -124,7 +124,7 @@ class SkyStats extends LitElement {
             this.days = 30;
         }
         this.language = searchParams.get("language") ?? "English";
-        this.brutal = searchParams.get("brutal") == "true";
+        this.brutal = false; // searchParams.get("brutal") == "true";
         const cacheKey = "cache:" + this.handle;
         if (searchParams.get("cache") == "true" && localStorage.getItem(cacheKey)) {
             try {
@@ -195,13 +195,13 @@ class SkyStats extends LitElement {
         if (!daysElement) return;
         const languageElement = this.querySelector<HTMLInputElement>("#language");
         if (!languageElement) return;
-        const brutalElement = this.querySelector<HTMLInputElement>("#brutal");
-        if (!brutalElement) return;
+        // const brutalElement = this.querySelector<HTMLInputElement>("#brutal");
+        // if (!brutalElement) return;
         const newUrl =new URL(location.href);
         newUrl.searchParams.set("handle", accountElement.value.trim() ?? "");
         newUrl.searchParams.set("days", daysElement.value ?? "30");
         newUrl.searchParams.set("language", languageElement.value ?? "en");
-        newUrl.searchParams.set("brutal", brutalElement.value ?? "false");
+        // newUrl.searchParams.set("brutal", brutalElement.value ?? "false");
         location.href = newUrl.href;
     }
 
@@ -237,13 +237,13 @@ class SkyStats extends LitElement {
                         <option value="365">Past year</option>
                     </select>
                 </div>
-                <div class="flex flex-col gap-2 items-start w-full">
+                <!--<div class="flex flex-col gap-2 items-start w-full">
                     <span class="text-gray-500 font-bold">Style</span>
                     <select id="brutal" class="px-4 py-2 border border-gray-300 text-gray-500 rounded-lg w-full">
                         <option selected value="false">Gentle</option>
                         <option value="true">Brutal</option>
                     </select>
-                </div>
+                </div>-->
                 <div class="flex flex-col gap-2 items-start w-full">
                     <span class="text-gray-500 font-bold">Language</span>
                     <select id="language" class="px-4 py-2 border border-gray-300 text-gray-500 rounded-lg w-full"></select>
